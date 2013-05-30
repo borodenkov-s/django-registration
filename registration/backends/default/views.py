@@ -71,17 +71,19 @@ class RegistrationView(BaseRegistrationView):
         class of this backend as the sender.
 
         """
-        username, email, password = cleaned_data['username'], cleaned_data['email'], cleaned_data['password1']
+        user_kwargs = self.get_user_kwargs(cleaned_data)
         if Site._meta.installed:
             site = Site.objects.get_current()
         else:
             site = RequestSite(request)
-        new_user = RegistrationProfile.objects.create_inactive_user(username, email,
-                                                                    password, site)
+        new_user = RegistrationProfile.objects.create_inactive_user(user_kwargs, site)
         signals.user_registered.send(sender=self.__class__,
                                      user=new_user,
                                      request=request)
         return new_user
+
+    def get_user_kwargs(self, cleaned_data):
+        return cleaned_data
 
     def registration_allowed(self, request):
         """
