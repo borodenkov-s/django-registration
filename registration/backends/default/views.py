@@ -76,8 +76,7 @@ class RegistrationView(BaseRegistrationView):
             site = Site.objects.get_current()
         else:
             site = RequestSite(request)
-        user_kwargs['site'] = site
-        new_user = RegistrationProfile.objects.create_inactive_user(**user_kwargs)
+        new_user = RegistrationProfile.objects.create_inactive_user(user_kwargs, site)
         signals.user_registered.send(sender=self.__class__,
                                      user=new_user,
                                      request=request)
